@@ -1,9 +1,14 @@
+package Entities;
+import World.World;
 import commands.Command_Interface;
+import RandomGenerator.RandomGenerator;
 import commands.Commands;
 
-public class Bot implements Comparable<Bot>{
+public class Bot implements Comparable<Bot>, worldObject{
 
-    final private int SIZE_COMMANDS = 20;
+    final private static Integer type = 1;
+
+    final private int SIZE_COMMANDS = 8;
     final private int SIZE_DNA = 20;
     final private int COUNT_CHANGED_COMMANDS = 20;
     private int position_x;
@@ -12,12 +17,13 @@ public class Bot implements Comparable<Bot>{
     private int health;
     int itter_head = 0;
 
-    Bot(int health){
+
+    public Bot(int health){
         this.health = health;
         makeDna();
     }
 
-    Bot(Bot bot_1, Bot bot_2){
+    public Bot(Bot bot_1, Bot bot_2){
         for(int i = 0; i<SIZE_DNA; i++){
             if (RandomGenerator.nextInt(100) % 2 == 0) {
                 dna[i] = bot_1.dna[i];
@@ -36,7 +42,7 @@ public class Bot implements Comparable<Bot>{
         position_y = y;
     }
 
-    private void makeDna(){
+    public void makeDna(){
         //fill in dna list form commands(integers from 0 to SIZE_COMMANDS), describes in MAP(TODO)
         for(int i = 0; i<SIZE_DNA; i++){
             dna[i] = RandomGenerator.nextInt(SIZE_COMMANDS);
@@ -55,14 +61,17 @@ public class Bot implements Comparable<Bot>{
         health += comm.getDeltaHealth();
         position_x = comm.get_x();
         position_y = comm.get_y();
+
+        System.out.println("PossitionX: " + position_x + " PossitionY: " + position_y);
+
     }
 
     private boolean isAlive(){
         return health>0;
     }
 
-    private void die(){
-        World.world[position_x][position_y] = 0;
+    public void die(){
+        World.getInstance().clearPossition(position_x, position_y);
     }
 
     public boolean itter(){
@@ -71,9 +80,11 @@ public class Bot implements Comparable<Bot>{
         //сдвигаем головку команды
         int count = 10;
         boolean isEndCommand = false;
-        while(!isEndCommand || count!=0 || isAlive()){
+        while(!isEndCommand && count!=0 && isAlive()){
             Command_Interface command = Commands.getCommand(dna[itter_head]);
-            isEndCommand = command.action(position_x, position_y, health);
+            isEndCommand = command.action(this, position_x, position_y, health);
+            System.out.println("Command: " + dna[itter_head]);
+            System.out.println("IsEndCommand: " + isEndCommand + " Count: " + count + "IsALIVE: " + isAlive());
             updateParam(command);
             count--;
         }
@@ -90,4 +101,9 @@ public class Bot implements Comparable<Bot>{
         return Integer.compare(health, o.health);
     }
 
+
+    @Override
+    public Integer getType() {
+        return type;
+    }
 }

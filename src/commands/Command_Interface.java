@@ -1,17 +1,26 @@
 package commands;
 
+
+import Entities.worldObject;
+
 public interface Command_Interface {
+    /*
+    * getDeltaHealth - возвращает целое число - изменение здоровья после выполнения команды
+    * get_x - возвращает число от 0 до World.getInstance().WORLD_SIZE X-позиция  бота после выполнения команды
+    * get_y - возвращает число от 0 до World.getInstance().WORLD_SIZE Y-позиция  бота после выполнения команды
+    * getShiftHead - возвращает смещение головки после выполнения данной команды
+    * action - выполняет действие и возвращает значение true если команда была завершающей иначе false
+    *
+    * */
 
-    //возвращает 0 если была завершающая команда 1 если нет
-    public boolean action(int x, int y, int health);
+    boolean action(worldObject obj, int x, int y, int health_);
 
-    //Дельта здоровья после выполнения команды
-    public int getDeltaHealth();
+    int getDeltaHealth();
 
-    public int get_x();
+    int get_x();
 
-    //возвращает сдвиг головки
-    public int getShiftHead();
+    int get_y();
 
-    public int get_y();
+    int getShiftHead();
+
 }

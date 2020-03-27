@@ -1,4 +1,6 @@
 package commands;
+import Entities.*;
+import World.World;
 
 public class Go_Down implements Command_Interface{
 
@@ -9,15 +11,36 @@ public class Go_Down implements Command_Interface{
     static int shift_head;
 
     @Override
-    public boolean action(int x, int y, int health_) {
+    public boolean action(worldObject obj, int x, int y, int health_) {
         receive_health = health_;
-        if(World.world[x][y-1]!=1 && World.world[x][y-1]!=-1){
-            World.world[x][y] = 0;
-            World.world[x][y-1] = 1;
+        health = health_ - 1;
+        worldObject w_obj = World.getInstance().getObject(x,y-1);
+        if(w_obj instanceof Bot){
+            new_x = x;
+            new_y = y;
+            shift_head = 1;
+        }
+        else if(w_obj instanceof obj_Stop){
+            new_x = x;
+            new_y = y;
+            shift_head = 2;
+        }
+        else if (w_obj instanceof obj_None){
+            World.getInstance().setObject(x, y, obj_None.getInstance());
+            World.getInstance().setObject(x, y-1, obj);
             new_x = x;
             new_y = y-1;
+            shift_head = 3;
         }
-        health = health_ - 1;
+        else if(w_obj instanceof obj_Meal){
+            new_x = x;
+            new_y = y-1;
+            World.getInstance().setObject(x, y, obj_None.getInstance());
+            World.getInstance().setObject(x, y-1, obj);
+            health += 10;
+            shift_head = 4;
+        }
+
         return true;
     }
 

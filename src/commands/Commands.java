@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Commands {
 
-    static private Map<Integer, Command_Interface> commands= new HashMap<Integer, Command_Interface>();
+    static private Map<Integer, Command_Interface> commands = new HashMap<Integer, Command_Interface>();
 
     static public void addCommand(int number, Command_Interface comm) {
         commands.put(number, comm);
