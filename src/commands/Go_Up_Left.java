@@ -27,7 +27,7 @@ public class Go_Up_Left implements Command_Interface{
         }
         else if (w_obj instanceof obj_None){
             World.getInstance().setObject(x, y, obj_None.getInstance());
-            World.getInstance().setObject(x, y-1, obj);
+            World.getInstance().setObject(x-1, y+1, obj);
             new_x = x-1;
             new_y = y+1;
             shift_head = 3;

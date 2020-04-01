@@ -36,7 +36,6 @@ public class World implements World_Interface {
             }
             System.out.println();
         }
-
     }
 
     @Override

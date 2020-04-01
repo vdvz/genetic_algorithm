@@ -97,19 +97,20 @@ public class Environment implements Environment_Interface{
     @Override
     public void itteration() {
         for (int i = 0; i < 100; i++) {
-            System.out.println("Itetration: " + i);
+            //System.out.println("Itetration: " + i);
             //Проходит через все объекты если клетка жива устанавливает ее здоровье иначе удаляет ее из карты
             for (Bot bot : population) {
                 if (!bot.itter()) {
                     population.remove(bot);
                 }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Gui_Interface.getInstance().draw();
             }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Gui_Interface.getInstance().draw();
+            //World.getInstance().printWorld();
         }
     }
 

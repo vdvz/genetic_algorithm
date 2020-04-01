@@ -4,7 +4,7 @@ import commands.Command_Interface;
 import RandomGenerator.RandomGenerator;
 import commands.Commands;
 
-public class Bot implements Comparable<Bot>, worldObject{
+public class Bot implements Comparable<Bot>, worldObject, Bot_Interface{
 
     final private static Integer type = 1;
 
@@ -66,7 +66,7 @@ public class Bot implements Comparable<Bot>, worldObject{
 
     }
 
-    private boolean isAlive(){
+    public boolean isAlive(){
         return health>0;
     }
 
@@ -83,8 +83,8 @@ public class Bot implements Comparable<Bot>, worldObject{
         while(!isEndCommand && count!=0 && isAlive()){
             Command_Interface command = Commands.getCommand(dna[itter_head]);
             isEndCommand = command.action(this, position_x, position_y, health);
-            System.out.println("Command: " + dna[itter_head]);
-            System.out.println("IsEndCommand: " + isEndCommand + " Count: " + count + "IsALIVE: " + isAlive());
+            //System.out.println("Command: " + dna[itter_head]);
+            //System.out.println("IsEndCommand: " + isEndCommand + " Count: " + count + "IsALIVE: " + isAlive());
             updateParam(command);
             count--;
         }
@@ -106,4 +106,5 @@ public class Bot implements Comparable<Bot>, worldObject{
     public Integer getType() {
         return type;
     }
+
 }

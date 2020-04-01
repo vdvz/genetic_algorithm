@@ -31,6 +31,7 @@ public class Gui_Interface {
     }
 
     public void draw(){
+        //field.updateUI();
         field.repaint();
         //field.update(field.getGraphics());
     }
@@ -61,8 +62,11 @@ class Field extends JPanel{
                     case 2:
                         g2.setColor(new Color(130, 100, 84));
                         break;
-                    default:
+                    case -1:
                         g2.setColor(new Color(217, 146, 54));
+                        break;
+                    default:
+                        System.out.println("Error");
                         break;
                 }
                 g2.fillRect(OFFSET_WIDTH + i*(RECT_WIDTH + OFFSET_BETWEEN_RECT),
