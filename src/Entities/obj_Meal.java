@@ -1,6 +1,6 @@
 package Entities;
 
-public class obj_Meal implements worldObject {
+public class obj_Meal implements Object_Interface {
 
 
     private static obj_Meal instance = new obj_Meal();

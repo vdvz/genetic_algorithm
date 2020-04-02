@@ -1,13 +1,13 @@
 package World;
 import Entities.obj_None;
 import Entities.obj_Stop;
-import Entities.worldObject;
+import Entities.Object_Interface;
 
 public class World implements World_Interface {
 
-    final int WORLD_SIZE = 10;
+    final int WORLD_SIZE = 20;
 
-    public worldObject[][] world = new worldObject[WORLD_SIZE][WORLD_SIZE];
+    public Object_Interface[][] world = new Object_Interface[WORLD_SIZE][WORLD_SIZE];
 
     private static World instance = new World();
 
@@ -44,12 +44,12 @@ public class World implements World_Interface {
     }
 
     @Override
-    public void setObject(int x, int y, worldObject obj) {
+    public void setObject(int x, int y, Object_Interface obj) {
         world[x][y] = obj;
     }
 
     @Override
-    public worldObject getObject(int x, int y) {
+    public Object_Interface getObject(int x, int y) {
         return world[x][y];
     }
 

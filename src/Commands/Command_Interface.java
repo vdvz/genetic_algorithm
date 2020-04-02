@@ -1,7 +1,7 @@
-package commands;
+package Commands;
 
 
-import Entities.worldObject;
+import Entities.Object_Interface;
 
 public interface Command_Interface {
     /*
@@ -13,7 +13,7 @@ public interface Command_Interface {
     *
     * */
 
-    boolean action(worldObject obj, int x, int y, int health_);
+    boolean action(Object_Interface obj, int x, int y, int health_);
 
     int getDeltaHealth();
 

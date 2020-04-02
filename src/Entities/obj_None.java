@@ -1,6 +1,6 @@
 package Entities;
 
-public class obj_None implements worldObject{
+public class obj_None implements Object_Interface {
 
     final private static Integer type = 0;
 

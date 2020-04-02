@@ -1,15 +1,15 @@
 package Entities;
 import World.World;
-import commands.Command_Interface;
+import Commands.Command_Interface;
 import RandomGenerator.RandomGenerator;
-import commands.Commands;
+import Commands.Commands;
 
-public class Bot implements Comparable<Bot>, worldObject, Bot_Interface{
+public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
 
     final private static Integer type = 1;
 
-    final private int SIZE_COMMANDS = 8;
-    final private int SIZE_DNA = 20;
+    final private int SIZE_COMMANDS = 24;
+    final private int SIZE_DNA = 60;
     final private int COUNT_CHANGED_COMMANDS = 20;
     private int position_x;
     private int position_y;
@@ -62,7 +62,7 @@ public class Bot implements Comparable<Bot>, worldObject, Bot_Interface{
         position_x = comm.get_x();
         position_y = comm.get_y();
 
-        System.out.println("PossitionX: " + position_x + " PossitionY: " + position_y);
+        //System.out.println("PossitionX: " + position_x + " PossitionY: " + position_y);
 
     }
 
@@ -71,10 +71,11 @@ public class Bot implements Comparable<Bot>, worldObject, Bot_Interface{
     }
 
     public void die(){
+        System.out.println("Bot die");
         World.getInstance().clearPossition(position_x, position_y);
     }
 
-    public boolean itter(){
+    public void itter(){
         //Пока не выполнится завершающая команда либо пока не выполнится 10 команд либо
         //пока бот жив выполняем команду обновляем состояние бота
         //сдвигаем головку команды
@@ -93,7 +94,6 @@ public class Bot implements Comparable<Bot>, worldObject, Bot_Interface{
             die();
         }
 
-        return isAlive();
     }
 
     @Override

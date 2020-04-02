@@ -1,9 +1,5 @@
-import Entities.Bot;
-import Entities.obj_Meal;
-import Entities.obj_Stop;
-import Entities.worldObject;
-import World.World;
-import commands.*;
+import Commands.*;
+import Environment.Environment;
 
 public class Test {
     public static void main(String[] args) throws InterruptedException {
@@ -16,9 +12,26 @@ public class Test {
         Commands.addCommand(5, new Go_Down());
         Commands.addCommand(6, new Go_Right());
         Commands.addCommand(7, new Go_Left());
+        Commands.addCommand(8, new Check_Up_Left());
+        Commands.addCommand(9, new Check_Up());
+        Commands.addCommand(10, new Check_Up_Right());
+        Commands.addCommand(11, new Check_Down_Left());
+        Commands.addCommand(12, new Check_Down_Right());
+        Commands.addCommand(13, new Check_Down());
+        Commands.addCommand(14, new Check_Right());
+        Commands.addCommand(15, new Check_Left());
+        Commands.addCommand(16, new Get_Up_Left());
+        Commands.addCommand(17, new Get_Up());
+        Commands.addCommand(18, new Get_Up_Right());
+        Commands.addCommand(19, new Get_Down_Left());
+        Commands.addCommand(20, new Get_Down_Right());
+        Commands.addCommand(21, new Get_Down());
+        Commands.addCommand(22, new Get_Right());
+        Commands.addCommand(23, new Get_Left());
+
 
         Environment env = new Environment();
-        env.itterateNewGeneration();
+        env.addNewGeneration();
 
     }
 }

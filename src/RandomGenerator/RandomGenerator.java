@@ -10,7 +10,6 @@ public class RandomGenerator {
         return gen.nextInt(diaposon);
     }
 
-
     static public float nextFloat(){
         return gen.nextFloat();
     }

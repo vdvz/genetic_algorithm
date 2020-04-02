@@ -1,4 +1,4 @@
-import Entities.worldObject;
+package Environment;
 
 public interface Environment_Interface {
 
@@ -10,7 +10,10 @@ public interface Environment_Interface {
 
     void addMeals();
 
-    void itterateNewGeneration();
+    void addPoison();
 
-    void itteration();
+    void addNewGeneration();
+
+    void iteration();
+
 }

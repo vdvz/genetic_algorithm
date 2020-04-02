@@ -1,12 +1,12 @@
 package World;
-import Entities.worldObject;
+import Entities.Object_Interface;
 
 
 public interface World_Interface {
 
-    void setObject(int x, int y, worldObject obj);
+    void setObject(int x, int y, Object_Interface obj);
 
-    worldObject getObject(int x, int y);
+    Object_Interface getObject(int x, int y);
 
     void clearPossition(int x, int y);
 
