@@ -1,10 +1,12 @@
 package Environment;
 
+import Exceptions.NotConverge;
+
 public interface Environment_Interface {
 
     void addBots();
 
-    void getSlice();
+    void getSlice() throws NotConverge;
 
     void generateNewGeneration();
 
@@ -12,7 +14,7 @@ public interface Environment_Interface {
 
     void addPoison();
 
-    void addNewGeneration();
+    void addNewGeneration() throws NotConverge;
 
     void iteration();
 

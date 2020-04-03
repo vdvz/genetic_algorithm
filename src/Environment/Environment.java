@@ -1,21 +1,37 @@
 package Environment;
 
 import Entities.*;
+import Exceptions.NotConverge;
 import Gui.Gui_Interface;
 import RandomGenerator.RandomGenerator;
 import World.*;
 
 import java.util.*;
 
+import static java.lang.System.exit;
+
 public class Environment implements Environment_Interface{
 
-    static final int POPULATION_SIZE = 10;
-    static final float MEAL_PROBABILITY = 0.2f;
-    static final int ITER_PER_GEN = 1000;
-    private static final float POISON_PROBABILITY = 0.1f;
+    private int POPULATION_SIZE = 10;
+    private float MEAL_PROBABILITY = 0.2f;
+    private int ITER_PER_GEN = 1000;
+    private float POISON_PROBABILITY = 0.1f;
     final private ArrayList<Bot> population = new ArrayList<>();
 
     public Environment(){
+        createBots(60,60,100);
+        System.out.println("HERE!");
+    }
+
+    public Environment(int population_size, float meal_prob, float poison_prob, int iter_count,
+                       int size_dna, int health, int count_changed_command){
+        POPULATION_SIZE = population_size;
+        MEAL_PROBABILITY = meal_prob;
+        POISON_PROBABILITY = poison_prob;
+        ITER_PER_GEN = iter_count;
+
+        createBots(size_dna, count_changed_command, health);
+
     }
 
     private Object_Interface probabilityFunction(float probability, Object_Interface obj){
@@ -34,6 +50,12 @@ public class Environment implements Environment_Interface{
         }
     }
 
+    public void createBots(int dna_size, int changed_command, int health){
+        for(int j = 0; j<POPULATION_SIZE; j++){
+            population.add(new Bot(dna_size, changed_command, health));
+        }
+    }
+
     @Override
     public void addPoison(){
         int N = World.getInstance().getWorldSize();
@@ -48,8 +70,7 @@ public class Environment implements Environment_Interface{
 
     @Override
     public void addBots(){
-        //Добавление ботов на карту - генерируем рандомнуе позици по x и y
-        //Если клетка свободна добавляем в нее бота у бота меняем координаты бота на заданые
+        /*Добавление ботов на карту в свободные клетки*/
         for(Bot bot: population){
             boolean isNotOkay = true;
             while(isNotOkay) {
@@ -66,15 +87,27 @@ public class Environment implements Environment_Interface{
     }
 
     @Override
-    public void getSlice(){
+    public void getSlice() throws NotConverge {
+        /*Сортирует список ботов, а после выбирает срез самых сильных, если ботов не достаточно для среза дублирует
+        * самого сильного, если ботов нет совсем, то алгоритм не сошелся.*/
         Collections.sort(population);
         int size_population_slice = (int) Math.sqrt(POPULATION_SIZE);
 
         if(population.size() >= size_population_slice){
             population.removeAll(population.subList(size_population_slice, population.size()-1));
         } else {
-            System.out.println("Sorry errors TODO print exception");
+            if(population.size()<1){
+                System.out.println("The algorithm did not converge");
+                throw new NotConverge("Too little bot's after iterate generation!");
+            }
+            else
+            while(population.size() < size_population_slice){
+                population.add(population.get(0));
+            }
         }
+    }
+
+    public void continueIterations(){
 
     }
 
@@ -91,25 +124,18 @@ public class Environment implements Environment_Interface{
     }
 
     @Override
-    public void addNewGeneration(){
+    public void addNewGeneration() throws NotConverge {
         World.getInstance().clearWorld();
-        if(population.size()==0){
-            for(int j = 0; j<POPULATION_SIZE; j++){
-                population.add(new Bot(100));
-            }
-        } else {
-            getSlice();
-            generateNewGeneration();
-        }
-        addMeals();
-        addPoison();
-        addBots();
-        Gui_Interface.getInstance();
+        getSlice();
+        generateNewGeneration();
         iteration();
     }
 
     @Override
     public void iteration() {
+        addMeals();
+        addPoison();
+        addBots();
         for (int i = 0; i < ITER_PER_GEN; i++) {
 
             for (Bot bot : population) {
@@ -117,14 +143,20 @@ public class Environment implements Environment_Interface{
                     bot.itter();
                 }
             }
-
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            Gui_Interface.getInstance().draw();
+            while(!Gui_Interface.getInstance().draw()){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             //World.getInstance().printWorld();
 
         }

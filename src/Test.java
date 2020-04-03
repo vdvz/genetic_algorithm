@@ -1,5 +1,7 @@
 import Commands.*;
 import Environment.Environment;
+import Exceptions.NotConverge;
+import Gui.Gui_Interface;
 
 public class Test {
     public static void main(String[] args) throws InterruptedException {
@@ -29,9 +31,16 @@ public class Test {
         Commands.addCommand(22, new Get_Right());
         Commands.addCommand(23, new Get_Left());
 
+        Gui_Interface.getInstance();
 
-        Environment env = new Environment();
-        env.addNewGeneration();
+        /*Environment env = new Environment();
+        env.iteration();
+        try {
+            env.addNewGeneration();
+        } catch (NotConverge notConverge) {
+            notConverge.printStackTrace();
+        }*/
+
 
     }
 }

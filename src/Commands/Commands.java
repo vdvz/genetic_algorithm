@@ -10,6 +10,10 @@ public class Commands {
         commands.put(number, comm);
     }
 
+    static public int getCountCommand(){
+        return commands.size();
+    }
+
     static public Command_Interface getCommand(int number){
         return commands.get(number);
     }

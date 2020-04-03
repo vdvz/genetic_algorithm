@@ -38,6 +38,8 @@ public class World implements World_Interface {
         }
     }
 
+
+
     @Override
     public int getWorldSize() {
         return WORLD_SIZE;
@@ -45,6 +47,9 @@ public class World implements World_Interface {
 
     @Override
     public void setObject(int x, int y, Object_Interface obj) {
+        if(0 > x || x >= getWorldSize() || 0 > y || y >= getWorldSize())
+            throw new IndexOutOfBoundsException("Try get obj from out of World-bounds index");
+
         world[x][y] = obj;
     }
 

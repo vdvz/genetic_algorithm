@@ -8,17 +8,23 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
 
     final private static Integer type = 1;
 
-    final private int SIZE_COMMANDS = 24;
-    final private int SIZE_DNA = 60;
-    final private int COUNT_CHANGED_COMMANDS = 20;
+    private int SIZE_COMMANDS = Commands.getCountCommand();
+    private int SIZE_DNA = 60;
+    private int COUNT_CHANGED_COMMANDS = 20;
     private int position_x;
     private int position_y;
     public int[] dna = new int[SIZE_DNA];
     private int health;
     int itter_head = 0;
 
-
     public Bot(int health){
+        this.health = health;
+        makeDna();
+    }
+
+    public Bot(int dna_size, int count_mutate_dna, int health){
+        SIZE_DNA = dna_size;
+        COUNT_CHANGED_COMMANDS = count_mutate_dna;
         this.health = health;
         makeDna();
     }
@@ -71,7 +77,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
     }
 
     public void die(){
-        System.out.println("Bot die");
+        System.out.println("Bot die: " + health);
         World.getInstance().clearPossition(position_x, position_y);
     }
 
