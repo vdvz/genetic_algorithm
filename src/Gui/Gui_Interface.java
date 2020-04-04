@@ -1,82 +1,92 @@
 package Gui;
 
+import Entities.Bot;
 import Environment.Environment;
-import Exceptions.UnknownWorldObject;
+import Exceptions.NotConverge;
 import World.World;
 
 import javax.swing.*;
-import javax.swing.plaf.DimensionUIResource;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 
-public class Gui_Interface {
-    Environment current_env = new Environment();
+public class Gui_Interface implements InterfaceForGUI{
 
-    private boolean PushStop = false;
-    private boolean PushStart = false;
-    private boolean PushClear = false;
+    Environment current_env = null;
+
+    private Timer timer = new Timer(0, null);
+
+    Window window;
+
+    private Gui_Interface(){
+        World.getInstance().clearWorld();
+        //при созданиии нового окна отрисуется пустой мир
+        window = new Window();
+
+    }
 
     private static Gui_Interface instance = new Gui_Interface();
-
-    public void setStopPush(boolean isTrue){
-        PushStop = isTrue;
-    }
-
-    public boolean getStopPush(){
-        return PushStop;
-    }
-
-    public void setStartPush(boolean isTrue){
-        PushStart = isTrue;
-    }
-
-    public boolean getStartPush(){
-        return PushStart;
-    }
-
-
-    public void setClearPush(boolean isTrue){
-        PushClear = isTrue;
-    }
-
-    public boolean getClearPush(){
-        return PushClear;
-    }
-
 
     public static Gui_Interface getInstance() {
         return instance;
     }
 
 
-    Window window;
-    private Gui_Interface(){
-        World.getInstance().clearWorld();
-        window = new Window();
 
+    public void newGeneration(){
+        try {
+            current_env.addNewGeneration();
+        } catch (NotConverge notConverge) {
+            notConverge.printStackTrace();
+        }
     }
 
+    @Override
+    public Timer getTimer(){
+        return timer;
+    }
+
+    public Environment getCurrent_env(){
+        return current_env;
+    }
+
+    @Override
     public void clear(){
-        World.getInstance().clearWorld();
-        setStartPush(false);
-        setStopPush(false);
+        current_env = null;
+        timer.stop();
         window.clear();
     }
 
+    @Override
     public void start(){
+        current_env = new Environment();
         current_env.iteration();
-        //setStartPush(true);
+
     }
 
-    public boolean draw(){
-        if(PushStop){
-            return false;
-        }
+    @Override
+    public void start(int population_size, float meal_prob, float poison_prob, int iter_count,
+                      int size_dna, int health, int count_changed_command) throws Exception {
+        current_env = new Environment(population_size, meal_prob, poison_prob, iter_count, size_dna, health, count_changed_command);
+        current_env.iteration();
+
+
+    }
+
+    public void stop(){
+        timer.stop();
+    }
+
+    public void write_message(String text){
+        window.write_text(text);
+    }
+
+    @Override
+    public void draw(){
         window.paint();
-        window.write_text();
-        return true;
     }
 
 }
@@ -109,7 +119,6 @@ class Window extends JFrame{
         jsp.setLocation(new Point(50, 10));
         jsp.setPreferredSize(new Dimension(750,670));
 
-
         info = new Info();
         text_jsp = new JScrollPane( info, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -117,10 +126,7 @@ class Window extends JFrame{
         //text_jsp.setViewportView(info);
         text_jsp.setLocation(new Point(850, 10));
         text_jsp.setPreferredSize(new Dimension(450,400));
-
-        JButton but = new JButton("HI");
-        but.setLocation(850, 430);
-        but.setSize(450,300);
+        info.setMaximumSize(text_jsp.getPreferredSize());
 
         buttons = new Buttons();
         buttons.setLocation(850, 430);
@@ -135,7 +141,7 @@ class Window extends JFrame{
     }
 
     public void clear(){
-        paint();
+        field.clear();
         info.clear();
     }
 
@@ -147,28 +153,33 @@ class Window extends JFrame{
         //field.update(field.getGraphics());
     }
 
-    public void write_text(){
-        info.add_text_info();
+    public void write_text(String text){
+        info.add_text_info(text);
         text_jsp.getVerticalScrollBar().setValue(text_jsp.getVerticalScrollBar().getMaximum());
     }
 
 }
-
 
 class Info extends JPanel{
     int size = 0;
     Info(){
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(new JLabel("Start iteration"));
+        add(new JLabel("Welcome to genetic algorithm!"));
+        add(new JLabel("Press START for begin"));
+        add(new JLabel("Press STOP for pause"));
+        add(new JLabel("Press CLEAR for start all again"));
+        add(new JLabel("Press BOT_INFO for find out info about bots"));
     }
 
 
-    public void add_text_info(){
-        JLabel jlb = new JLabel("Vados\nVV: " + "\n NN: " + getSize().height);
-        size+=jlb.getFont().getSize();
+    public void add_text_info(String text){
+        JLabel jlb = new JLabel(text);
+        jlb.setMaximumSize(new Dimension(getMaximumSize().width, jlb.getPreferredSize().height));
+        //jlb.setMaximumSize(new Dimension(getMaximumSize()));
+        size += jlb.getPreferredSize().height;
         if(getSize().height < size){
-            setSize(getWidth(),getHeight()+jlb.getFont().getSize());
+            setSize(getWidth(),getHeight()+jlb.getPreferredSize().height);
         }
         add(jlb);
         repaint();
@@ -177,6 +188,11 @@ class Info extends JPanel{
 
     public void clear() {
         removeAll();
+        add_text_info("Welcome to genetic algorithm!");
+        add_text_info("Press START for begin");
+        add_text_info("Press STOP for pause");
+        add_text_info("Press CLEAR for start all again");
+        add_text_info("Press BOT_INFO for find out info about bots");
         repaint();
         revalidate();
     }
@@ -185,7 +201,7 @@ class Info extends JPanel{
 class startFrame extends JFrame{
 
     startFrame(){
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(450, 100, 400,400);
 
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -245,8 +261,10 @@ class startFrame extends JFrame{
         health_label.setAlignmentY(10f);
         health.setMaximumSize(new Dimension(getMaximumSize().width, population_size.getFont().getSize()+20));
 
-
-
+        JButton confirm_and_start = new JButton("START");
+        JTextPane err_pane = new JTextPane();
+        err_pane.setBackground(null);
+        err_pane.setEditable(false);
 
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
@@ -257,7 +275,8 @@ class startFrame extends JFrame{
                                 .addComponent(iter_count_label)
                                 .addComponent(size_dna_label)
                                 .addComponent(change_commands_label)
-                                .addComponent(health_label))
+                                .addComponent(health_label)
+                                .addComponent(confirm_and_start))
                         .addGroup(layout.createParallelGroup()
                                 .addComponent(population_size)
                                 .addComponent(meal_probability)
@@ -265,7 +284,8 @@ class startFrame extends JFrame{
                                 .addComponent(iter_count)
                                 .addComponent(size_dna)
                                 .addComponent(change_commands)
-                                .addComponent(health))
+                                .addComponent(health)
+                                .addComponent(err_pane))
 
         );
         layout.setVerticalGroup(
@@ -291,35 +311,125 @@ class startFrame extends JFrame{
                         .addGroup(layout.createParallelGroup()
                                 .addComponent(health_label)
                                 .addComponent(health))
+                        .addGroup(layout.createParallelGroup()
+                                .addComponent(confirm_and_start)
+                                .addComponent(err_pane))
 
         );
 
-
-
-
-        JButton confirm_and_start = new JButton("START");
 
         confirm_and_start.setAlignmentX(60.0f);
         confirm_and_start.setAlignmentY(20.0f);
 
         confirm_and_start.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                //String text = population_size.getText();
-                //TODO Проверить на ошибки
+            public void actionPerformed(ActionEvent e){
+                try{
+                Gui_Interface.getInstance().start(
+                        Integer.parseInt(population_size.getText()),
+                        Float.parseFloat(meal_probability.getText()),
+                        Float.parseFloat(poison_probability.getText()),
+                        Integer.parseInt(iter_count.getText()),
+                        Integer.parseInt(size_dna.getText()),
+                        Integer.parseInt(health.getText()),
+                        Integer.parseInt(change_commands.getText())
+                );
+                } catch (NumberFormatException ex){
+                    err_pane.setText("Incorrect number format, please write Float or Int");
+                    err_pane.validate();
+                    return;
+                } catch (Exception ex) {
+                    err_pane.setText("Incorrect number of population, please write less than WORLD_SIZE^2, WORLD_SIZE: " + World.getInstance().getWorldSize());
+                    err_pane.validate();
+                    return;
+                }
                 dispose();
-                Gui_Interface.getInstance().start();
             }
         });
 
         add(panel);
-        add(confirm_and_start);
 
         setVisible(true);
 
     }
 
 }
+
+
+class DnaInfo extends JFrame{
+
+    DnaInfo(ArrayList<Bot> list){
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setBounds(450, 100, 400,400);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JScrollPane jsp = new JScrollPane(panel,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        ComboBoxRender render = new ComboBoxRender();
+
+        for(int i = 0; i<list.size(); i++){
+            JComboBox cmbox = new JComboBox();
+            cmbox.setEditor(new ComboBoxEditor(i));
+            cmbox.setRenderer(render);
+            cmbox.addItem(list.get(i));
+            cmbox.setPreferredSize(new Dimension(panel.getPreferredSize().width, cmbox.getPreferredSize().height));
+            cmbox.setEditable(true);
+            panel.add(cmbox);
+        }
+
+        add(jsp);
+        setVisible(true);
+    }
+
+    class ComboBoxEditor extends BasicComboBoxEditor {
+        private JPanel panel = new JPanel();
+        private Object selectedItem;
+
+        public ComboBoxEditor(int bot_number) {
+            JLabel label = new JLabel();
+            label.setOpaque(false);
+            label.setText("Bot: " + bot_number);
+            label.setFont(new Font("Arial", Font.BOLD, 14));
+            label.setForeground(Color.BLACK);
+
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 2));
+            panel.add(label);
+            //panel.setBackground(Color.GREEN);
+        }
+
+        public Component getEditorComponent() {
+            return this.panel;
+        }
+
+        public Object getItem() {
+            return this.selectedItem;
+        }
+
+        public void setItem(Object item) {
+            this.selectedItem = item;
+            //label.setText(((Bot) item).getName());
+        }
+    }
+
+    class ComboBoxRender extends JLabel implements ListCellRenderer{
+
+        ComboBoxRender(){
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            Bot b = (Bot) value;
+            setText(b.getDnaString());
+            return this;
+        }
+
+    }
+
+
+}
+
 
 class Buttons extends JPanel{
 
@@ -331,7 +441,12 @@ class Buttons extends JPanel{
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new startFrame();
+                if(Gui_Interface.getInstance().getCurrent_env()==null){
+                    new startFrame();
+                    Gui_Interface.getInstance().write_message("Start iteration!");
+                }else{
+                    Gui_Interface.getInstance().getTimer().start();
+                }
             }
         });
 
@@ -341,7 +456,7 @@ class Buttons extends JPanel{
         stop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Gui_Interface.getInstance().start();
+                Gui_Interface.getInstance().stop();
             }
         });
 
@@ -355,13 +470,30 @@ class Buttons extends JPanel{
             }
         });
 
+        JButton bots_info = new JButton("BOT INFO");
+        bots_info.setSize(100, 50);
+        bots_info.setLocation(0,start.getHeight() + 20);
+        bots_info.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(Gui_Interface.getInstance().getTimer().isRunning()){
+                    Gui_Interface.getInstance().stop();
+                }
+                if(Gui_Interface.getInstance().getCurrent_env() == null){
+                    Gui_Interface.getInstance().write_message("Env have not been start yet");
+                    return;
+                }
+                new DnaInfo(Gui_Interface.getInstance().getCurrent_env().getBotList());
+            }
+        });
+
+
+        add(bots_info);
         add(clear);
         add(start);
         add(stop);
 
     }
-
-
 
 }
 
@@ -409,5 +541,11 @@ class Field extends JPanel {
                                 RECT_WIDTH, RECT_HEIGHT);
             }
         }
+    }
+
+    public void clear() {
+        World.getInstance().clearWorld();
+        getGraphics().clearRect(0, 0, getMaximumSize().width, getMaximumSize().height);
+        repaint();
     }
 }

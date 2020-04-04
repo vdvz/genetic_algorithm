@@ -19,6 +19,8 @@ public interface Bot_Interface {
 
     void mutationDna();
 
+    String getDnaString();
+
     void die();
 
 }

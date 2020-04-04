@@ -7,7 +7,6 @@ import Commands.Commands;
 public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
 
     final private static Integer type = 1;
-
     private int SIZE_COMMANDS = Commands.getCountCommand();
     private int SIZE_DNA = 60;
     private int COUNT_CHANGED_COMMANDS = 20;
@@ -16,6 +15,14 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
     public int[] dna = new int[SIZE_DNA];
     private int health;
     int itter_head = 0;
+
+    public String getDnaString(){
+        StringBuilder s = new StringBuilder("");
+        for(int i = 0; i < SIZE_DNA; i++ ){
+            s.append(dna[i]).append(" ");
+        }
+        return s.toString();
+    }
 
     public Bot(int health){
         this.health = health;
@@ -37,6 +44,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
                 dna[i] = bot_2.dna[i];
             }
         }
+
         health = (bot_1.health+bot_2.health)/2;
     }
 

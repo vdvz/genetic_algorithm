@@ -6,6 +6,8 @@ import Gui.Gui_Interface;
 import RandomGenerator.RandomGenerator;
 import World.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 
 import static java.lang.System.exit;
@@ -16,22 +18,50 @@ public class Environment implements Environment_Interface{
     private float MEAL_PROBABILITY = 0.2f;
     private int ITER_PER_GEN = 1000;
     private float POISON_PROBABILITY = 0.1f;
+    int delay = 100;
+    ActionListener actionListener;
     final private ArrayList<Bot> population = new ArrayList<>();
 
     public Environment(){
-        createBots(60,60,100);
-        System.out.println("HERE!");
+        createBots(60, 60, 100);
+
+        Gui_Interface.getInstance().getTimer().addActionListener(createActionListnerForTimer());
     }
 
     public Environment(int population_size, float meal_prob, float poison_prob, int iter_count,
-                       int size_dna, int health, int count_changed_command){
+                       int size_dna, int health, int count_changed_command) throws Exception {
+        if(population_size > World.getInstance().getWorldSize() * World.getInstance().getWorldSize())
+            throw new Exception("Неверный размер популяции");
         POPULATION_SIZE = population_size;
         MEAL_PROBABILITY = meal_prob;
         POISON_PROBABILITY = poison_prob;
         ITER_PER_GEN = iter_count;
-
         createBots(size_dna, count_changed_command, health);
 
+        Gui_Interface.getInstance().getTimer().addActionListener(createActionListnerForTimer());
+
+    }
+
+    public ActionListener createActionListnerForTimer(){
+        return new ActionListener() {
+            int iter = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (Bot bot : population) {
+                    if (bot.isAlive()) {
+                        bot.itter();
+                    }
+                }
+
+                Gui_Interface.getInstance().draw();
+                iter+=1;
+                if(iter > ITER_PER_GEN){
+                    Gui_Interface.getInstance().getTimer().stop();
+                    iter = 0;
+                    Gui_Interface.getInstance().newGeneration();
+                }
+            }
+        };
     }
 
     private Object_Interface probabilityFunction(float probability, Object_Interface obj){
@@ -91,6 +121,7 @@ public class Environment implements Environment_Interface{
         /*Сортирует список ботов, а после выбирает срез самых сильных, если ботов не достаточно для среза дублирует
         * самого сильного, если ботов нет совсем, то алгоритм не сошелся.*/
         Collections.sort(population);
+        Gui_Interface.getInstance().write_message("Alive population: " + population.size());
         int size_population_slice = (int) Math.sqrt(POPULATION_SIZE);
 
         if(population.size() >= size_population_slice){
@@ -105,10 +136,6 @@ public class Environment implements Environment_Interface{
                 population.add(population.get(0));
             }
         }
-    }
-
-    public void continueIterations(){
-
     }
 
     @Override
@@ -133,34 +160,18 @@ public class Environment implements Environment_Interface{
 
     @Override
     public void iteration() {
+
         addMeals();
         addPoison();
         addBots();
-        for (int i = 0; i < ITER_PER_GEN; i++) {
 
-            for (Bot bot : population) {
-                if (bot.isAlive()) {
-                    bot.itter();
-                }
-            }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        Gui_Interface.getInstance().getTimer().setDelay(delay);
+        Gui_Interface.getInstance().getTimer().start();
 
-            while(!Gui_Interface.getInstance().draw()){
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            //World.getInstance().printWorld();
-
-        }
     }
 
+    public ArrayList<Bot> getBotList() {
+        return population;
+    }
 }
 

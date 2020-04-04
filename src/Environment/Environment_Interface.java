@@ -1,6 +1,9 @@
 package Environment;
 
+import Entities.Bot;
 import Exceptions.NotConverge;
+
+import java.util.ArrayList;
 
 public interface Environment_Interface {
 
@@ -18,4 +21,5 @@ public interface Environment_Interface {
 
     void iteration();
 
+    ArrayList<Bot> getBotList();
 }

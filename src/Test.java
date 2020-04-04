@@ -33,14 +33,6 @@ public class Test {
 
         Gui_Interface.getInstance();
 
-        /*Environment env = new Environment();
-        env.iteration();
-        try {
-            env.addNewGeneration();
-        } catch (NotConverge notConverge) {
-            notConverge.printStackTrace();
-        }*/
-
 
     }
 }

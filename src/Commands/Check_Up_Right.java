@@ -4,16 +4,16 @@ import World.World;
 
 public class Check_Up_Right implements Command_Interface{
 
-    static int new_x;
-    static int health;
-    static int receive_health;
-    static int new_y;
-    static int shift_head;
+    int new_x;
+    int health;
+    int receive_health;
+    int new_y;
+    int shift_head;
 
     @Override
     public boolean action(Object_Interface obj, int x, int y, int health_) {
         receive_health = health_;
-        health = health_ - 1;
+        health = health_;
         new_x = x;
         new_y = y;
         Object_Interface w_obj = World.getInstance().getObject(x+1,y+1);
