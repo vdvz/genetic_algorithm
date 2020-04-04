@@ -30,9 +30,19 @@ public class Test {
         Commands.addCommand(21, new Get_Down());
         Commands.addCommand(22, new Get_Right());
         Commands.addCommand(23, new Get_Left());
+        Commands.addCommand(24, new UnconditionalStep_10());
+        Commands.addCommand(25, new UnconditionalStep_11());
+        Commands.addCommand(26, new UnconditionalStep_12());
+        Commands.addCommand(27, new UnconditionalStep_13());
+        Commands.addCommand(28, new UnconditionalStep_14());
+        Commands.addCommand(29, new UnconditionalStep_15());
+        Commands.addCommand(30, new UnconditionalStep_16());
+        Commands.addCommand(31, new UnconditionalStep_17());
+        Commands.addCommand(32, new UnconditionalStep_18());
+        Commands.addCommand(33, new UnconditionalStep_19());
+        Commands.addCommand(34, new UnconditionalStep_20());
 
         Gui_Interface.getInstance();
-
 
     }
 }

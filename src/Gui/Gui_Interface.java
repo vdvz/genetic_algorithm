@@ -170,6 +170,7 @@ class Info extends JPanel{
         add(new JLabel("Press STOP for pause"));
         add(new JLabel("Press CLEAR for start all again"));
         add(new JLabel("Press BOT_INFO for find out info about bots"));
+        add(new JLabel("Press START for continue"));
     }
 
 
@@ -192,7 +193,7 @@ class Info extends JPanel{
         add_text_info("Press START for begin");
         add_text_info("Press STOP for pause");
         add_text_info("Press CLEAR for start all again");
-        add_text_info("Press BOT_INFO for find out info about bots");
+        add_text_info("Press START for continue");
         repaint();
         revalidate();
     }
@@ -324,6 +325,11 @@ class startFrame extends JFrame{
         confirm_and_start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
+                if(Gui_Interface.getInstance().getCurrent_env()!=null){
+                    err_pane.setText("Already run!");
+                    err_pane.validate();
+                    return;
+                }
                 try{
                 Gui_Interface.getInstance().start(
                         Integer.parseInt(population_size.getText()),
@@ -339,7 +345,8 @@ class startFrame extends JFrame{
                     err_pane.validate();
                     return;
                 } catch (Exception ex) {
-                    err_pane.setText("Incorrect number of population, please write less than WORLD_SIZE^2, WORLD_SIZE: " + World.getInstance().getWorldSize());
+                    err_pane.setText(ex.getMessage());
+                    //ex.printStackTrace();
                     err_pane.validate();
                     return;
                 }
@@ -350,7 +357,6 @@ class startFrame extends JFrame{
         add(panel);
 
         setVisible(true);
-
     }
 
 }
@@ -366,14 +372,15 @@ class DnaInfo extends JFrame{
         JScrollPane jsp = new JScrollPane(panel,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        ComboBoxRender render = new ComboBoxRender();
+        ComboBoxRender render = new ComboBoxRender(getSize());
 
         for(int i = 0; i<list.size(); i++){
             JComboBox cmbox = new JComboBox();
+            cmbox.setPreferredSize(new Dimension(panel.getPreferredSize().width, cmbox.getPreferredSize().height));
             cmbox.setEditor(new ComboBoxEditor(i));
             cmbox.setRenderer(render);
             cmbox.addItem(list.get(i));
-            cmbox.setPreferredSize(new Dimension(panel.getPreferredSize().width, cmbox.getPreferredSize().height));
+
             cmbox.setEditable(true);
             panel.add(cmbox);
         }
@@ -389,6 +396,7 @@ class DnaInfo extends JFrame{
         public ComboBoxEditor(int bot_number) {
             JLabel label = new JLabel();
             label.setOpaque(false);
+            label.setSize(getPreferredSize());
             label.setText("Bot: " + bot_number);
             label.setFont(new Font("Arial", Font.BOLD, 14));
             label.setForeground(Color.BLACK);
@@ -412,14 +420,19 @@ class DnaInfo extends JFrame{
         }
     }
 
-    class ComboBoxRender extends JLabel implements ListCellRenderer{
+    class ComboBoxRender extends JTextArea implements ListCellRenderer{
 
-        ComboBoxRender(){
+        ComboBoxRender(Dimension dim){
+            setEditable(false);
+            setLineWrap(true);
+            //setWrapStyleWord(true);
+            setMaximumSize(new Dimension(dim.width-20, dim.height));
             setOpaque(true);
         }
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            setSize(new Dimension(getMaximumSize().width, getPreferredSize().height));
             Bot b = (Bot) value;
             setText(b.getDnaString());
             return this;

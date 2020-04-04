@@ -30,11 +30,14 @@ public class Environment implements Environment_Interface{
 
     public Environment(int population_size, float meal_prob, float poison_prob, int iter_count,
                        int size_dna, int health, int count_changed_command) throws Exception {
-        if(population_size > World.getInstance().getWorldSize() * World.getInstance().getWorldSize())
-            throw new Exception("Неверный размер популяции");
+        if(population_size < 1 ||population_size > (World.getInstance().getWorldSize()-2) * (World.getInstance().getWorldSize()-2))
+            throw new Exception("Неверный размер популяции, WORLD_SIZE: " + World.getInstance().getWorldSize());
         POPULATION_SIZE = population_size;
+        if(meal_prob<0) throw new Exception("Нвееврное значение вероятности пищи");
         MEAL_PROBABILITY = meal_prob;
+        if(poison_prob<0) throw new Exception("Нвееврное значение вероятности яда");
         POISON_PROBABILITY = poison_prob;
+        if(iter_count<0) throw new Exception("Нвееврное значение количество итераций");
         ITER_PER_GEN = iter_count;
         createBots(size_dna, count_changed_command, health);
 
@@ -120,34 +123,44 @@ public class Environment implements Environment_Interface{
     public void getSlice() throws NotConverge {
         /*Сортирует список ботов, а после выбирает срез самых сильных, если ботов не достаточно для среза дублирует
         * самого сильного, если ботов нет совсем, то алгоритм не сошелся.*/
+
+        population.removeIf(b -> !b.isAlive());
+
         Collections.sort(population);
         Gui_Interface.getInstance().write_message("Alive population: " + population.size());
-        int size_population_slice = (int) Math.sqrt(POPULATION_SIZE);
+        int size_population_slice = (int) Math.floor(Math.sqrt(POPULATION_SIZE));
 
-        if(population.size() >= size_population_slice){
-            population.removeAll(population.subList(size_population_slice, population.size()-1));
-        } else {
-            if(population.size()<1){
-                System.out.println("The algorithm did not converge");
-                throw new NotConverge("Too little bot's after iterate generation!");
-            }
-            else
-            while(population.size() < size_population_slice){
-                population.add(population.get(0));
-            }
+
+        if(population.size()<1){
+            System.out.println("The algorithm did not converge");
+            throw new NotConverge("Too little bot's after iterate generation!");
         }
+
+
+
     }
 
     @Override
     public void generateNewGeneration(){
-        int size_population_slice = (int) Math.sqrt(POPULATION_SIZE);
-        for(int i = 0; i<size_population_slice; i++){
-            for(int j = 0; j<size_population_slice; j++){
-                if(j != i){
-                    population.add(new Bot(population.get(i), population.get(j)));
+
+        if(population.size() > 1){
+            Iterator<Bot> i = population.iterator();
+            Iterator<Bot> j = population.iterator();
+            while(i.hasNext())
+                while(j.hasNext()){
+                    Bot b1 = i.next();
+                    Bot b2 = j.next();
+                    if(b1!=b2){
+                        population.add(new Bot(b1, b2));
+                    }
+                    if(population.size()==POPULATION_SIZE) break;
                 }
-            }
         }
+
+        while(population.size() < POPULATION_SIZE){
+            population.add(new Bot(population.get(0)));
+        }
+
     }
 
     @Override
@@ -160,10 +173,9 @@ public class Environment implements Environment_Interface{
 
     @Override
     public void iteration() {
-
+        addBots();
         addMeals();
         addPoison();
-        addBots();
 
         Gui_Interface.getInstance().getTimer().setDelay(delay);
         Gui_Interface.getInstance().getTimer().start();

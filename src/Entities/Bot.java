@@ -12,7 +12,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
     private int COUNT_CHANGED_COMMANDS = 20;
     private int position_x;
     private int position_y;
-    public int[] dna = new int[SIZE_DNA];
+    public int[] dna;
     private int health;
     int itter_head = 0;
 
@@ -26,17 +26,31 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
 
     public Bot(int health){
         this.health = health;
+        dna = new int[SIZE_DNA];
         makeDna();
+    }
+
+    public Bot(Bot bot_1){
+        SIZE_DNA = bot_1.SIZE_DNA;
+        COUNT_CHANGED_COMMANDS = bot_1.COUNT_CHANGED_COMMANDS;
+        dna = new int[SIZE_DNA];
+        System.arraycopy(bot_1.dna, 0, dna, 0, SIZE_DNA);
+        health = bot_1.health;
+        mutationDna();
     }
 
     public Bot(int dna_size, int count_mutate_dna, int health){
         SIZE_DNA = dna_size;
         COUNT_CHANGED_COMMANDS = count_mutate_dna;
         this.health = health;
+        dna = new int[SIZE_DNA];
         makeDna();
     }
 
     public Bot(Bot bot_1, Bot bot_2){
+        SIZE_DNA = bot_1.SIZE_DNA;
+        COUNT_CHANGED_COMMANDS = bot_1.COUNT_CHANGED_COMMANDS;
+        dna = new int[SIZE_DNA];
         for(int i = 0; i<SIZE_DNA; i++){
             if (RandomGenerator.nextInt(100) % 2 == 0) {
                 dna[i] = bot_1.dna[i];
@@ -44,7 +58,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
                 dna[i] = bot_2.dna[i];
             }
         }
-
+        mutationDna();
         health = (bot_1.health+bot_2.health)/2;
     }
 
@@ -65,7 +79,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
 
     public void mutationDna(){
         //Change random count_changed_commands to random commands
-        for(int i = 0; i< COUNT_CHANGED_COMMANDS; i++){
+        for(int i = 0; i < COUNT_CHANGED_COMMANDS; i++){
             dna[RandomGenerator.nextInt(SIZE_DNA)] = RandomGenerator.nextInt(SIZE_COMMANDS);
         }
     }
@@ -81,11 +95,15 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
     }
 
     public boolean isAlive(){
-        return health>0;
+        if(health<=0){
+            die();
+            return false;
+        }
+        return true;
     }
 
     public void die(){
-        System.out.println("Bot die: " + health);
+        //System.out.println("Bot die: " + health);
         World.getInstance().clearPossition(position_x, position_y);
     }
 
@@ -95,19 +113,15 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
         //сдвигаем головку команды
         int count = 10;
         boolean isEndCommand = false;
-        while(!isEndCommand && count!=0 && isAlive()){
+        while(!isEndCommand && count!=0){
+            if(!isAlive()){
+                break;
+            }
             Command_Interface command = Commands.getCommand(dna[itter_head]);
             isEndCommand = command.action(this, position_x, position_y, health);
-            //System.out.println("Command: " + dna[itter_head]);
-            //System.out.println("IsEndCommand: " + isEndCommand + " Count: " + count + "IsALIVE: " + isAlive());
             updateParam(command);
             count--;
         }
-
-        if(!isAlive()){
-            die();
-        }
-
     }
 
     @Override
