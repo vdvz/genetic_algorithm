@@ -34,7 +34,7 @@ public class Check_Down_Left implements Command_Interface{
             shift_head = 5;
         }
 
-        return true;
+        return false;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class Check_Up_Right implements Command_Interface{
             shift_head = 5;
         }
 
-        return true;
+        return false;
     }
 
     @Override

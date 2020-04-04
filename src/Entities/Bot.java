@@ -35,8 +35,12 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
         COUNT_CHANGED_COMMANDS = bot_1.COUNT_CHANGED_COMMANDS;
         dna = new int[SIZE_DNA];
         System.arraycopy(bot_1.dna, 0, dna, 0, SIZE_DNA);
-        health = bot_1.health;
+        health = 100;
         mutationDna();
+    }
+
+    public void setHealth(int health_){
+        health = health_;
     }
 
     public Bot(int dna_size, int count_mutate_dna, int health){
@@ -59,7 +63,7 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
             }
         }
         mutationDna();
-        health = (bot_1.health+bot_2.health)/2;
+        health = 100;
     }
 
     public void set_x(int x){
@@ -121,6 +125,9 @@ public class Bot implements Comparable<Bot>, Object_Interface, Bot_Interface{
             isEndCommand = command.action(this, position_x, position_y, health);
             updateParam(command);
             count--;
+        }
+        if(count == 0 ){
+            health-=10;
         }
     }
 

@@ -35,6 +35,7 @@ public class Environment implements Environment_Interface{
         POPULATION_SIZE = population_size;
         if(meal_prob<0) throw new Exception("Нвееврное значение вероятности пищи");
         MEAL_PROBABILITY = meal_prob;
+        if(size_dna < count_changed_command) throw new Exception("Количество мутированных клеток днк должно быть меньше или равно размеру днк");
         if(poison_prob<0) throw new Exception("Нвееврное значение вероятности яда");
         POISON_PROBABILITY = poison_prob;
         if(iter_count<0) throw new Exception("Нвееврное значение количество итераций");
@@ -130,12 +131,14 @@ public class Environment implements Environment_Interface{
         Gui_Interface.getInstance().write_message("Alive population: " + population.size());
         int size_population_slice = (int) Math.floor(Math.sqrt(POPULATION_SIZE));
 
+        for (Bot bot : population) {
+            bot.setHealth(100);
+        }
 
         if(population.size()<1){
             System.out.println("The algorithm did not converge");
             throw new NotConverge("Too little bot's after iterate generation!");
         }
-
 
 
     }
@@ -158,8 +161,10 @@ public class Environment implements Environment_Interface{
         }
 
         while(population.size() < POPULATION_SIZE){
-            population.add(new Bot(population.get(0)));
+            population.add(new Bot(population.iterator().next()));
         }
+
+        Gui_Interface.getInstance().write_message("New population: " + population.size());
 
     }
 

@@ -40,6 +40,8 @@ public class Gui_Interface implements InterfaceForGUI{
         try {
             current_env.addNewGeneration();
         } catch (NotConverge notConverge) {
+            clear();
+            write_message("Last algorithm didn't converge, let try one more time/");
             notConverge.printStackTrace();
         }
     }
@@ -166,6 +168,7 @@ class Info extends JPanel{
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(new JLabel("Welcome to genetic algorithm!"));
+        add(new JLabel("If u wanna send different WORLD_SIZE, set it in World class and recompile."));
         add(new JLabel("Press START for begin"));
         add(new JLabel("Press STOP for pause"));
         add(new JLabel("Press CLEAR for start all again"));
@@ -190,6 +193,7 @@ class Info extends JPanel{
     public void clear() {
         removeAll();
         add_text_info("Welcome to genetic algorithm!");
+        add_text_info("If u wanna send different WORLD_SIZE, set it in World class and recompile.");
         add_text_info("Press START for begin");
         add_text_info("Press STOP for pause");
         add_text_info("Press CLEAR for start all again");

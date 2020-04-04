@@ -35,7 +35,7 @@ public class Check_Down_Right implements Command_Interface{
         }
 
 
-        return true;
+        return false;
     }
 
     @Override
